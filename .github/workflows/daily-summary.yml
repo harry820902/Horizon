@@ -2,8 +2,11 @@ name: Daily Horizon Summary
 
 on:
   schedule:
-    # 00:00 UTC = 08:00 Asia/Taipei daily
-    - cron: '0 0 * * *'
+    # 23:30 UTC = 07:30 Asia/Taipei daily.
+    # Earlier than 00:00 UTC to dodge GHA's peak-hour scheduling congestion;
+    # documented schedule delay can be up to 60 min, so this still arrives
+    # by ~08:30 Taipei worst case.
+    - cron: '30 23 * * *'
   workflow_dispatch:      # Allow manual trigger
 
 jobs:
