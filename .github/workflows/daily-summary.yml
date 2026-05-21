@@ -1,13 +1,11 @@
 name: Daily Horizon Summary
 
 on:
-  schedule:
-    # 23:30 UTC = 07:30 Asia/Taipei daily.
-    # Earlier than 00:00 UTC to dodge GHA's peak-hour scheduling congestion;
-    # documented schedule delay can be up to 60 min, so this still arrives
-    # by ~08:30 Taipei worst case.
-    - cron: '30 23 * * *'
-  workflow_dispatch:      # Allow manual trigger
+  # GitHub Actions scheduled triggers proved unreliable for forks
+  # (delayed up to 2 hours in real measurement on 2026-05-21). Replaced
+  # with cron-job.org → workflow_dispatch trigger for ±1 min accuracy.
+  # The schedule block is intentionally removed.
+  workflow_dispatch:      # Triggered by cron-job.org every day at 07:30 Asia/Taipei
 
 jobs:
   daily-summary:
