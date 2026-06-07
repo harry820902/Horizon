@@ -31,6 +31,8 @@ ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 
 WEBHOOK_URL = os.environ.get("HORIZON_WEBHOOK_URL")
+# 第二發送目的地（選用，例：另一個 Discord 頻道）。兩個都設就同時發。
+WEBHOOK_URL_2 = os.environ.get("HORIZON_WEBHOOK_URL_2")
 LANG = os.environ.get("DISCORD_DIGEST_LANG", "zh")
 MAX_ITEMS = int(os.environ.get("DISCORD_DIGEST_MAX", "20"))
 USERNAME = os.environ.get("DISCORD_DIGEST_USERNAME", "Horizon AI Daily")
@@ -115,8 +117,16 @@ payload = {
     "embeds": [embed],
 }
 
-resp = httpx.post(WEBHOOK_URL, json=payload, timeout=30.0)
-print(f"Discord POST status={resp.status_code} desc_len={len(description)} items={len(top)}")
-if resp.status_code >= 300:
-    print("Response body:", resp.text[:500], file=sys.stderr)
+# 發到所有設定的目的地（原 webhook + 選用的第二個）。逐一發送、逐一報狀態，
+# 任一個失敗就 exit 5，但不影響其他目的地的發送。
+targets = [u for u in (WEBHOOK_URL, WEBHOOK_URL_2) if u]
+failed = 0
+for i, url in enumerate(targets, 1):
+    resp = httpx.post(url, json=payload, timeout=30.0)
+    print(f"Discord POST [{i}/{len(targets)}] status={resp.status_code} desc_len={len(description)} items={len(top)}")
+    if resp.status_code >= 300:
+        print(f"  Response body [{i}]:", resp.text[:500], file=sys.stderr)
+        failed += 1
+
+if failed:
     sys.exit(5)

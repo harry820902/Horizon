@@ -40,6 +40,7 @@ jobs:
       - name: Send compact Discord digest (Traditional Chinese, embed format)
         env:
           HORIZON_WEBHOOK_URL: ${{ secrets.HORIZON_WEBHOOK_URL }}
+          HORIZON_WEBHOOK_URL_2: ${{ secrets.HORIZON_WEBHOOK_URL_2 }}
           DISCORD_DIGEST_LANG: zh
           DISCORD_DIGEST_MAX: "20"
         run: uv run python scripts/send_compact_discord.py
